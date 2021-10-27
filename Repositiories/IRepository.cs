@@ -11,6 +11,6 @@ namespace DemoInteraktiva.Repositiories
       
         Task<SummaryDto> GetSummaryAsync();
         Task<IEnumerable<CountryDto>> GetCountriesAsync();
-        Task<IEnumerable<TotalDto>> GetCountryTotal(string countrySlug);
+        Task<IEnumerable<TotalDto>> GetCountryTotal(string countrySlug); //
     }
 }
