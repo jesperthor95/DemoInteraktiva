@@ -1,0 +1,11 @@
+
+@model List<PersonViewModel>
+<h1> Personer i vår lista</h1>
+<ul>
+    @foreach (var person in Model)
+    {
+        <li>@person.Firstname</li>
+    }
+    
+</ul>
+<h1>@Model[0].Firstname</h1>
