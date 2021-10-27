@@ -1,4 +1,6 @@
 ﻿using DemoInteraktiva.Models;
+using DemoInteraktiva.Models.ViewModels;
+using DemoInteraktiva.Repositiories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,27 +13,80 @@ namespace DemoInteraktiva.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private IRepository repository;
 
-        public HomeController(ILogger<HomeController> logger)
+        //Dependecy injection
+        public HomeController(IRepository repository)
         {
-            _logger = logger;
+            this.repository = repository;
+        }
+        //Dependency inversion
+        public async Task <IActionResult> Index()
+        {
+            // hämta från api
+            // hantera resultatet du hämtar
+            var tasks = new List<Task>();
+            var CountryTotals = new List<List<TotalDto>>();
+            var countries = await repository.GetCountriesAsync(); //Hämtar en lista av länder från API
+           
+
+            //try
+            //{
+            //    foreach (var country in countries)
+            //    {
+            //        tasks.Add(
+            //            Task.Run(
+            //                    async () =>
+            //                    {
+            //                        var result = await repository.GetCountryTotal(country.Slug);
+            //                        CountryTotals.Add(result.ToList());
+            //                    }
+            //                )
+            //            );
+            //    }
+            //    await Task.WhenAll(tasks);
+            //}
+            //catch (Exception)
+            //{
+                
+            //}      
+
+            try
+             {
+                
+               var task1 = repository.GetSummaryAsync();
+                var task2 = repository.GetCountriesAsync();
+              
+
+                await Task.WhenAll(task1, task2); // väntar tills alla anrop (tasks) är klar
+                
+
+                var summary = await task1;
+                var countrie = await task2;
+               
+
+                var model = new HomeViewModel(summary);
+                // Hanterar resultatet
+
+                return View(model);
+
+            }
+            catch (Exception)
+            {
+                var model = new HomeViewModel();
+                ModelState.AddModelError(string.Empty, "Fick inte kontakt med Covidstatistiken. Visar istället gammal statistik.");
+                return View(model);
+                throw;
+            }
+          
+
+            
+            
+           
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+  
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        
     }
 }
